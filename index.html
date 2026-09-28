@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Licencias ALEKS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    /* Ocupar toda la pantalla del móvil/escritorio */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .portal-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      padding: 2.5rem 2rem;
+      width: 90%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    /* Contenedor de Logos */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 2rem;
+    }
+
+    .logo-container img {
+      max-height: 55px;
+      max-width: 140px;
+      object-fit: contain;
+      filter: drop-shadow(0px 2px 6px rgba(0,0,0,0.3));
+    }
+
+    .divider {
+      width: 2px;
+      height: 45px;
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Botones Grandes de Rol */
+    .btn-portal {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 18px 24px;
+      border-radius: 16px;
+      text-decoration: none;
+      color: white;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-bottom: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-portal i {
+      font-size: 2.2rem;
+      margin-right: 18px;
+    }
+
+    .btn-portal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: block;
+      text-align: left;
+    }
+
+    .btn-portal-subtitle {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      display: block;
+      text-align: left;
+    }
+
+    /* Estilo Botón Alumnos */
+    .btn-alumno {
+      background: linear-gradient(90deg, #2563eb 0%, #0284c7 100%);
+    }
+
+    .btn-alumno:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+      color: white;
+    }
+
+    /* Estilo Botón Administrador */
+    .btn-admin {
+      background: linear-gradient(90deg, #0d9488 0%, #059669 100%);
+    }
+
+    .btn-admin:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(13, 148, 136, 0.4);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="portal-card">
+    <!-- CONTENEDOR DE LOGOS -->
+    <div class="logo-container">
+      <!-- Reemplaza los src por las imágenes de tu Universidad y ALEKS -->
+      <img src="https://via.placeholder.com/150x60/ffffff/0f2744?text=UNIVERSIDAD" alt="Logo Universidad">
+      <div class="divider"></div>
+      <img src="https://via.placeholder.com/150x60/ffffff/000000?text=ALEKS" alt="Logo ALEKS">
+    </div>
+
+    <h4 class="fw-bold mb-1">Gestión de Licencias</h4>
+    <p class="text-white-50 small mb-4">Selecciona el módulo al que deseas ingresar</p>
+
+    <!-- BOTÓN 1: ALUMNOS (Recuperar / Consultar) -->
+    <a id="link-alumno" href="#" class="btn-portal btn-alumno">
+      <i class="bi bi-person-badge"></i>
+      <div>
+        <span class="btn-portal-title">Recuperar Licencia</span>
+        <span class="btn-portal-subtitle">Para alumnos matriculados</span>
+      </div>
+    </a>
+
+    <!-- BOTÓN 2: ADMINISTRATIVO (Asignación y Pagos) -->
+    <a id="link-admin" href="#" class="btn-portal btn-admin">
+      <i class="bi bi-shield-lock"></i>
+      <div>
+        <span class="btn-portal-title">Asignación de Licencia</span>
+        <span class="btn-portal-subtitle">Módulo Administrativo y Cajas</span>
+      </div>
+    </a>
+  </div>
+
+  <script>
+    // ==========================================
+    // INGRESA TU URL BASE DE APPS SCRIPT AQUÍ:
+    // ==========================================
+    const APPS_SCRIPT_BASE_URL = "https://script.google.com/macros/s/AKfycbxmiLbRPU7ccsa7xLgSEmM7EAG_EA0MKmFEckPm9t4M3tcZ3YgVdALsYSwINhMVT5hK/exec";
+
+    // Generar enlaces dinámicos
+    document.getElementById('link-alumno').href = APPS_SCRIPT_BASE_URL + "?p=alumno";
+    document.getElementById('link-admin').href = APPS_SCRIPT_BASE_URL;
+  </script>
+
+</body>
+</html>
