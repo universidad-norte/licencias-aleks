@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    body { background-color: #f4f6f9; padding-top: 40px; }
+    .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .badge-code { font-size: 1.4rem; letter-spacing: 2px; }
+  </style>
+</head>
+<body>
+
+  <div class="container" style="max-width: 650px;">
+    <div class="text-center mb-4">
+      <h3 class="fw-bold text-primary">Consulta tu Licencia ALEKS</h3>
+      <p class="text-muted">Ingresa tus datos de clase para visualizar tu código asignado</p>
+    </div>
+
+    <!-- ÁREA DE NOTIFICACIONES HTML -->
+    <div id="contenedor-notificacion"></div>
+
+    <div class="card p-4 mb-4">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label text-muted small">Hora</label>
+          <input type="text" id="alumno-hora" class="form-control" placeholder="Ej. 08:00">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label text-muted small">Salón</label>
+          <input type="text" id="alumno-salon" class="form-control" placeholder="Ej. A-102">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label text-muted small">Matrícula</label>
+          <input type="text" id="alumno-matricula" class="form-control" placeholder="Ej. 123456">
+        </div>
+      </div>
+      <button class="btn btn-primary mt-3 fw-bold py-2" id="btn-consultar" onclick="consultarAlumno()">Consultar Mi Licencia</button>
+    </div>
+
+    <!-- RESULTADO -->
+    <div id="resultado-alumno" class="card p-4" style="display:none;">
+      <h5 class="fw-bold text-secondary mb-3">Detalles Registrados</h5>
+      
+      <div class="mb-2"><strong>Alumno:</strong> <span id="res-nombre" class="text-dark"></span></div>
+      <div class="mb-2"><strong>Materia:</strong> <span id="res-materia" class="text-dark"></span></div>
+      <div class="mb-3"><strong>Maestro:</strong> <span id="res-maestro" class="text-dark"></span></div>
+      
+      <hr>
+
+      <div class="text-center my-3 p-3 bg-light rounded-3">
+        <label class="text-muted d-block mb-2">Tu Código de Licencia ALEKS es:</label>
+        <span id="res-licencia" class="badge bg-success badge-code p-3"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function mostrarAlerta(mensaje, tipo) {
+      let contenedor = document.getElementById('contenedor-notificacion');
+      contenedor.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show shadow-sm mb-4" role="alert">
+          ${mensaje}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+    }
+
+    function consultarAlumno() {
+      let h = document.getElementById('alumno-hora').value;
+      let s = document.getElementById('alumno-salon').value;
+      let m = document.getElementById('alumno-matricula').value;
+
+      if (!h || !s || !m) {
+        mostrarAlerta('Por favor llena los tres campos para realizar la consulta.', 'warning');
+        return;
+      }
+
+      let btn = document.getElementById('btn-consultar');
+      btn.disabled = true;
+      btn.innerText = 'Consultando...';
+
+      google.script.run.withSuccessHandler(res => {
+        btn.disabled = false;
+        btn.innerText = 'Consultar Mi Licencia';
+
+        if (res.exito) {
+          document.getElementById('resultado-alumno').style.display = 'block';
+          document.getElementById('res-nombre').innerText = res.nombreAlumno;
+          document.getElementById('res-materia').innerText = res.materia;
+          document.getElementById('res-maestro').innerText = res.nombreMaestro;
+          document.getElementById('res-licencia').innerText = res.licenciaAleks;
+          
+          document.getElementById('contenedor-notificacion').innerHTML = '';
+        } else {
+          document.getElementById('resultado-alumno').style.display = 'none';
+          mostrarAlerta(res.mensaje, 'danger');
+        }
+      }).buscarAlumnoVista(h, s, m);
+    }
+  </script>
+</body>
+</html>
