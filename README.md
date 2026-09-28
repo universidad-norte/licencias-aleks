@@ -93,7 +93,7 @@ Portal autoconsulta optimizado, rápido y accesible desde cualquier dispositivo 
    * Digita únicamente su **Matrícula** (no requiere recordar salón ni horario) y presiona *Enter* o el botón **"Consultar Licencia"**.
 2. **Visualización de Resultados:**
    Si la licencia ya fue cobrada y asignada en cajas, el portal desplegará:
-   * **Datos Generales:** Nombre, Materia y Nombre del Profesor.
+   * **Datos Generales:** Nombre del Alumno
    * **Nivel y Plan:** Nivel educativo y vigencia de su paquete.
    * **Código de Licencia ALEKS:** Resaltado en una tarjeta interactiva para copiar.
    * **Fecha Límite / Vencimiento:** Formato estandarizado `dd/MMM/yyyy` (Ej. `28/sep/2027`).
