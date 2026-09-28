@@ -4,9 +4,8 @@
   <base target="_top">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <style>
-    body { background-color: #f4f6f9; padding-top: 40px; padding-bottom: 40px; }
+    body { background-color: #f4f6f9; padding-top: 30px; padding-bottom: 40px; }
     .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .header-bar { background: white; border-bottom: 1px solid #e9ecef; padding: 15px 0; margin-bottom: 30px; }
   </style>
 </head>
 <body>
@@ -15,17 +14,16 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
         <h3 class="fw-bold text-dark mb-0">Panel de Administración</h3>
-        <span class="text-muted small">Gestión y Entrega de Licencias ALEKS</span>
+        <span class="text-muted small">Asignación de Licencias ALEKS</span>
       </div>
-      <span class="badge bg-primary px-3 py-2">Modo Administrador</span>
+      <span class="badge bg-primary px-3 py-2">Cajas / Administración</span>
     </div>
 
-    <!-- ÁREA DE NOTIFICACIONES HTML -->
     <div id="contenedor-notificacion"></div>
 
     <!-- TARJETA 1: BÚSQUEDA -->
     <div class="card p-4 mb-4">
-      <h5 class="fw-bold mb-3 text-secondary">1. Búsqueda de Alumno</h5>
+      <h5 class="fw-bold mb-3 text-secondary">1. Buscar Alumno</h5>
       <div class="row g-3">
         <div class="col-md-4">
           <label class="form-label text-muted small">Hora</label>
@@ -43,26 +41,50 @@
       <button class="btn btn-primary mt-3 fw-bold" id="btn-buscar" onclick="buscarAdmin()">Buscar Alumno</button>
     </div>
 
-    <!-- TARJETA 2: RESULTADOS Y CAPTURA -->
+    <!-- TARJETA 2: CAPTURA Y ASIGNACIÓN -->
     <div id="resultado-admin" class="card p-4" style="display:none;">
-      <h5 class="fw-bold mb-3 text-secondary">2. Información del Alumno</h5>
+      <h5 class="fw-bold mb-3 text-secondary">2. Datos del Alumno</h5>
       <div class="bg-light p-3 rounded-3 mb-4">
         <div class="row g-2">
           <div class="col-md-6"><strong>Alumno:</strong> <span id="lbl-alumno" class="text-primary fw-bold"></span></div>
           <div class="col-md-6"><strong>Materia:</strong> <span id="lbl-materia"></span></div>
-          <div class="col-md-12"><strong>Correo Registrado:</strong> <span id="lbl-correo"></span></div>
+          <div class="col-md-12"><strong>Correo:</strong> <span id="lbl-correo"></span></div>
+          <div class="col-md-12" id="box-licencia-actual" style="display:none;">
+            <strong>Licencia Actual Asignada:</strong> <span id="lbl-licencia-actual" class="badge bg-success fs-6"></span>
+          </div>
         </div>
       </div>
 
-      <h5 class="fw-bold mb-3 text-secondary">3. Captura de Pago</h5>
+      <h5 class="fw-bold mb-3 text-secondary">3. Selección de Tipo de Licencia y Pago</h5>
       <input type="hidden" id="admin-filaindex">
       <input type="hidden" id="admin-licencia">
-      
+
       <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label text-muted small">Fecha de Pago</label>
-          <input type="date" id="admin-fechapago" class="form-control">
+        <!-- SELECTOR DE NIVEL -->
+        <div class="col-md-6">
+          <label class="form-label text-muted small">Nivel Académico</label>
+          <select id="select-nivel" class="form-select" onchange="actualizarVigencias()">
+            <option value="">-- Seleccionar Nivel --</option>
+            <option value="Preparatoria">Preparatoria</option>
+            <option value="Universidad">Universidad</option>
+          </select>
         </div>
+
+        <!-- SELECTOR DE VIGENCIA DINÁMICO -->
+        <div class="col-md-6">
+          <label class="form-label text-muted small">Vigencia de Licencia</label>
+          <select id="select-vigencia" class="form-select">
+            <option value="">-- Primero elija el nivel --</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label text-muted small">
+            Fecha de Pago <span id="lbl-vencimiento-estimado" class="text-success fw-bold small"></span>
+          </label>
+          <input type="date" id="admin-fechapago" class="form-control" onchange="calcularVencimientoPantalla()">
+        </div>
+
         <div class="col-md-4">
           <label class="form-label text-muted small">Cajera</label>
           <input type="text" id="admin-cajera" class="form-control" placeholder="Nombre o ID">
@@ -74,93 +96,160 @@
       </div>
 
       <button class="btn btn-success mt-4 fw-bold py-2" id="btn-registrar" onclick="registrarYEnviar()">
-        Registrar Pago y Enviar Licencia
+        Asignar Licencia, Registrar Pago y Enviar Correo
       </button>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    function mostrarAlerta(mensaje, tipo) {
-      let contenedor = document.getElementById('contenedor-notificacion');
-      contenedor.innerHTML = `
-        <div class="alert alert-${tipo} alert-dismissible fade show shadow-sm mb-4" role="alert">
-          ${mensaje}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+
+<script>
+  function mostrarAlerta(mensaje, tipo) {
+    document.getElementById('contenedor-notificacion').innerHTML = `
+      <div class="alert alert-${tipo} alert-dismissible fade show shadow-sm mb-4" role="alert">
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `;
+  }
+
+  function actualizarVigencias() {
+    let nivel = document.getElementById('select-nivel').value;
+    let comboVigencia = document.getElementById('select-vigencia');
+    comboVigencia.innerHTML = '';
+
+    if (nivel === 'Preparatoria') {
+      comboVigencia.innerHTML = `
+        <option value="1 Año">1 Año</option>
+        <option value="4 Meses">4 Meses</option>
       `;
+    } else if (nivel === 'Universidad') {
+      comboVigencia.innerHTML = `
+        <option value="1 Año">1 Año</option>
+        <option value="2 Meses">2 Meses</option>
+      `;
+    } else {
+      comboVigencia.innerHTML = `<option value="">-- Primero elija el nivel --</option>`;
+    }
+    calcularVencimientoPantalla();
+  }
+
+  function calcularVencimientoPantalla() {
+    let fechaPagoStr = document.getElementById('admin-fechapago').value;
+    let vigencia = document.getElementById('select-vigencia').value;
+    let lbl = document.getElementById('lbl-vencimiento-estimado');
+
+    if (fechaPagoStr && vigencia) {
+      let partes = fechaPagoStr.split('-');
+      let f = new Date(partes[0], partes[1] - 1, partes[2]);
+
+      if (vigencia === '1 Año') f.setFullYear(f.getFullYear() + 1);
+      else if (vigencia === '4 Meses') f.setMonth(f.getMonth() + 4);
+      else if (vigencia === '2 Meses') f.setMonth(f.getMonth() + 2);
+
+      let meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      let dd = String(f.getDate()).padStart(2, '0');
+      let mmm = meses[f.getMonth()];
+      let yyyy = f.getFullYear();
+
+      lbl.innerText = `(Vence aprox: ${dd}/${mmm}/${yyyy})`;
+    } else {
+      lbl.innerText = '';
+    }
+  }
+
+  function buscarAdmin() {
+    let h = document.getElementById('admin-hora').value;
+    let s = document.getElementById('admin-salon').value;
+    let m = document.getElementById('admin-matricula').value;
+
+    if (!h || !s || !m) {
+      mostrarAlerta('Por favor completa los tres campos de búsqueda.', 'warning');
+      return;
     }
 
-    function buscarAdmin() {
-      let h = document.getElementById('admin-hora').value;
-      let s = document.getElementById('admin-salon').value;
-      let m = document.getElementById('admin-matricula').value;
+    let btn = document.getElementById('btn-buscar');
+    btn.disabled = true;
+    btn.innerText = 'Buscando...';
 
-      if (!h || !s || !m) {
-        mostrarAlerta('Por favor completa todos los campos de búsqueda (Hora, Salón y Matrícula).', 'warning');
-        return;
-      }
-
-      let btn = document.getElementById('btn-buscar');
-      btn.disabled = true;
-      btn.innerText = 'Buscando...';
-
-      google.script.run.withSuccessHandler(res => {
-        btn.disabled = false;
-        btn.innerText = 'Buscar Alumno';
+    google.script.run.withSuccessHandler(res => {
+      btn.disabled = false;
+      btn.innerText = 'Buscar Alumno';
+      
+      if (res.exito) {
+        document.getElementById('resultado-admin').style.display = 'block';
+        document.getElementById('lbl-alumno').innerText = res.nombreAlumno;
+        document.getElementById('lbl-materia').innerText = res.materia;
+        document.getElementById('lbl-correo').innerText = res.correoAlumno;
         
-        if (res.exito) {
-          document.getElementById('resultado-admin').style.display = 'block';
-          document.getElementById('lbl-alumno').innerText = res.nombreAlumno;
-          document.getElementById('lbl-materia').innerText = res.materia;
-          document.getElementById('lbl-correo').innerText = res.correoAlumno;
-          
-          document.getElementById('admin-filaindex').value = res.filaIndex;
-          document.getElementById('admin-licencia').value = res.licenciaAleks;
+        document.getElementById('admin-filaindex').value = res.filaIndex;
+        document.getElementById('admin-licencia').value = res.licenciaAleks;
+        
+        // Poner la fecha de hoy por defecto si no hay fecha cargada
+        if (res.fechaPago) {
           document.getElementById('admin-fechapago').value = res.fechaPago;
-          document.getElementById('admin-cajera').value = res.cajera;
-          document.getElementById('admin-folio').value = res.folioRecibo;
-          
-          document.getElementById('contenedor-notificacion').innerHTML = '';
         } else {
-          document.getElementById('resultado-admin').style.display = 'none';
-          mostrarAlerta(res.mensaje, 'danger');
+          document.getElementById('admin-fechapago').value = new Date().toISOString().split('T')[0];
         }
-      }).buscarAlumnoAdmin(h, s, m);
-    }
 
-    function registrarYEnviar() {
-      let datos = {
-        filaIndex: document.getElementById('admin-filaindex').value,
-        nombreAlumno: document.getElementById('lbl-alumno').innerText,
-        materia: document.getElementById('lbl-materia').innerText,
-        correoAlumno: document.getElementById('lbl-correo').innerText,
-        licenciaAleks: document.getElementById('admin-licencia').value,
-        fechaPago: document.getElementById('admin-fechapago').value,
-        cajera: document.getElementById('admin-cajera').value,
-        folioRecibo: document.getElementById('admin-folio').value
-      };
+        document.getElementById('admin-cajera').value = res.cajera;
+        document.getElementById('admin-folio').value = res.folioRecibo;
 
-      if (!datos.fechaPago || !datos.cajera || !datos.folioRecibo) {
-        mostrarAlerta('Por favor completa la <strong>Fecha de Pago</strong>, <strong>Cajera</strong> y el <strong>Folio del Recibo</strong>.', 'warning');
-        return;
+        if (res.nivel) document.getElementById('select-nivel').value = res.nivel;
+        actualizarVigencias();
+        if (res.vigencia) document.getElementById('select-vigencia').value = res.vigencia;
+
+        if (res.licenciaAleks) {
+          document.getElementById('box-licencia-actual').style.display = 'block';
+          document.getElementById('lbl-licencia-actual').innerText = res.licenciaAleks;
+        } else {
+          document.getElementById('box-licencia-actual').style.display = 'none';
+        }
+
+        calcularVencimientoPantalla();
+        document.getElementById('contenedor-notificacion').innerHTML = '';
+      } else {
+        document.getElementById('resultado-admin').style.display = 'none';
+        mostrarAlerta(res.mensaje, 'danger');
       }
+    }).buscarAlumnoAdmin(h, s, m);
+  }
 
-      let btn = document.getElementById('btn-registrar');
-      btn.disabled = true;
-      btn.innerText = 'Procesando y enviando correo...';
+  function registrarYEnviar() {
+    let datos = {
+      filaIndex: document.getElementById('admin-filaindex').value,
+      nombreAlumno: document.getElementById('lbl-alumno').innerText,
+      materia: document.getElementById('lbl-materia').innerText,
+      correoAlumno: document.getElementById('lbl-correo').innerText,
+      licenciaAleks: document.getElementById('admin-licencia').value,
+      nivel: document.getElementById('select-nivel').value,
+      vigencia: document.getElementById('select-vigencia').value,
+      fechaPago: document.getElementById('admin-fechapago').value,
+      cajera: document.getElementById('admin-cajera').value,
+      folioRecibo: document.getElementById('admin-folio').value
+    };
 
-      google.script.run.withSuccessHandler(res => {
-        btn.disabled = false;
-        btn.innerText = 'Registrar Pago y Enviar Licencia';
-        
-        if (res.exito) {
-          mostrarAlerta(res.mensaje, 'success');
-        } else {
-          mostrarAlerta(res.mensaje, 'danger');
-        }
-      }).registrarPagoYEnviarCorreo(datos);
+    if (!datos.nivel || !datos.vigencia || !datos.fechaPago || !datos.cajera || !datos.folioRecibo) {
+      mostrarAlerta('Por favor completa el Nivel, Vigencia, Fecha, Cajera y Folio de Recibo.', 'warning');
+      return;
     }
-  </script>
+
+    let btn = document.getElementById('btn-registrar');
+    btn.disabled = true;
+    btn.innerText = 'Asignando licencia y enviando correo...';
+
+    google.script.run.withSuccessHandler(res => {
+      btn.disabled = false;
+      btn.innerText = 'Asignar Licencia, Registrar Pago y Enviar Correo';
+      
+      if (res.exito) {
+        mostrarAlerta(res.mensaje, 'success');
+      } else {
+        mostrarAlerta(res.mensaje, 'danger');
+      }
+    }).registrarPagoYEnviarCorreo(datos);
+  }
+</script>
+
 </body>
 </html>
