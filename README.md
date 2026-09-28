@@ -85,3 +85,47 @@ Diseñado para uso exclusivo del personal administrativo/cajeras. Permite asocia
 Portal autoconsulta optimizado, rápido y accesible desde cualquier dispositivo móvil o de escritorio.
 
 ### Pasos para el Estudiante:
+
+[ Ingresar Matrícula ] ➔ [ Clic en Consultar ] ➔ [ Obtención de Código y Vencimiento ]
+
+1. **Consulta Simple:**
+   * El alumno ingresa al enlace público con el parámetro `?p=alumno`.
+   * Digita únicamente su **Matrícula** (no requiere recordar salón ni horario) y presiona *Enter* o el botón **"Consultar Licencia"**.
+2. **Visualización de Resultados:**
+   Si la licencia ya fue cobrada y asignada en cajas, el portal desplegará:
+   * **Datos Generales:** Nombre, Materia y Nombre del Profesor.
+   * **Nivel y Plan:** Nivel educativo y vigencia de su paquete.
+   * **Código de Licencia ALEKS:** Resaltado en una tarjeta interactiva para copiar.
+   * **Fecha Límite / Vencimiento:** Formato estandarizado `dd/MMM/yyyy` (Ej. `28/sep/2027`).
+
+---
+
+## 4. Lógica de Negocio y Reglas de Vigencia
+
+El sistema parametriza la validez del acceso según las reglas fijadas por la institución:
+
+* **Reglas de Vigencia:**
+  * **Preparatoria:** Licencias de **1 Año** o **4 Meses**.
+  * **Universidad:** Licencias de **1 Año** o **2 Meses**.
+* **Cálculo de Fechas:** 
+  La fecha de expiración se calcula sumando los meses exactos o el año completo a partir de la **Fecha de Pago** ingresada en cajas.
+* **Formato Universal de Fecha:** 
+  Todas las fechas visibles e impresas en la hoja de cálculo se formatean como `dd/MMM/yyyy` para evitar ambigüedades entre formatos regionales.
+
+---
+
+## 5. Configuración y Despliegue
+
+1. Abrir la hoja de cálculo en **Google Sheets** con la estructura descrita.
+2. Ir a `Extensiones` > `Apps Script`.
+3. Crear los archivos de proyecto:
+   * `Código.gs` (Servidor)
+   * `login.html` (Vista Login Admin)
+   * `admin.html` (Vista Panel Cajas)
+   * `alumno.html` (Vista Consulta Alumnos)
+4. Hacer clic en **Implementar** > **Nueva implementación** > Tipo: **Aplicación Web**.
+   * **Ejecutar como:** *Tu cuenta de correo*
+   * **Quién tiene acceso:** *Cualquier persona*
+5. Copiar la URL generada.
+   * **Vista Alumnos:** `URL_DEL_DESPLIEGUE?p=alumno`
+   * **Vista Administración:** `URL_DEL_DESPLIEGUE`
